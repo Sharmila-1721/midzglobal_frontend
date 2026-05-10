@@ -1,64 +1,14 @@
-import {
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-  Navigate
-
-} from 'react-router-dom';
-
-function ProtectedRoute({
-
-  children,
-
-  role
-
-}) {
-
-  /* =========================
-     GET TOKEN
-  ========================= */
-
-  const token =
-    localStorage.getItem('token');
-
-  /* =========================
-     GET USER
-  ========================= */
-
-  const user =
-    JSON.parse(
-      localStorage.getItem('user')
-    );
-
-  /* =========================
-     NOT LOGGED IN
-  ========================= */
-
-  if (!token || !user) {
-
-    return <Navigate to='/login' />;
-
-  }
-
-  /* =========================
-     ROLE CHECK
-  ========================= */
-
-  if (
-
-    role &&
-    user.role !== role
-
-  ) {
-
-    return <Navigate to='/login' />;
-
-  }
-
-  /* =========================
-     ACCESS GRANTED
-  ========================= */
-
+export default function ProtectedRoute({ children, roles }) {
+  const { user, loading } = useAuth();
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-[#faf7f2]">
+      <div className="w-8 h-8 border-4 border-[#6b5a2e] border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+  if (!user) return <Navigate to="/" replace />;
+  if (roles && !roles.includes(user.role)) return <Navigate to="/dashboard" replace />;
   return children;
-
 }
-
-export default ProtectedRoute;
